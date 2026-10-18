@@ -1,5 +1,30 @@
 # Validation, 2026-10-19
 
+## 0.1.1 publication
+
+- Version metadata is 0.1.1 on both loaders. Clean builds with --no-build-cache,
+  12 core unit tests and 22/22 required isolated GameTests per loader passed.
+- The combined test command exposed the GUI-only NeoForge fixture being loaded
+  into the dedicated GameTest server. Run configurations now explicitly select
+  product-only, product+GameTest, or product+GUI-smoke mods. Test counts and
+  assertions were not relaxed; the complete build/GameTest run then passed.
+- A minimized 1px window exposed a graphical-test false positive and a negative
+  screen scale. The screen now keeps a positive scale at minimized dimensions.
+  GUI smoke restores its own test window and refuses tiny render targets; the
+  initial minimized screenshots are not accepted as graphical evidence.
+- Final rebuilt JARs passed both graphical runs: four native modes, original
+  native widget coordinates, reference-clear controls, no control/slot overlap,
+  mounted patterns, scrolling, sync, scaling, model checks and close/reopen.
+  Actual framebuffer screenshots are 1280x960, with 525/346 sampled colors for
+  Forge/NeoForge. They were visually inspected and are saved under
+  evidence/gui-0.1.1-forge/ and evidence/gui-0.1.1-neoforge/.
+- Resource audit: 20 JSON files, 46 bilingual keys. Production linkage checks
+  passed; runtime metadata is 0.1.1 and test fixture classes are absent.
+- Forge SHA-256: 35314399436B0A73CE0A677AD5E242CCEDF49334F5CCC23E49523CA8F566A754.
+- NeoForge SHA-256: 97B3B4CED1D991D71C62165A1C2090418AE18756004B6A803A575C2B8A7EBD74.
+- Full live-user-modpack acceptance remains unverified. No TPS claim is made.
+  No live mods, launch scripts, configs or saved user worlds were modified.
+
 ## 0.1.0 layout correction before binary release
 
 - The initial graphical acceptance checked actions but missed overlapping addon

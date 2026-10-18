@@ -53,7 +53,7 @@ public final class EncoderScreen extends NativeTerminalScreen {
   public void init() {
     int realWidth = minecraft.getWindow().getGuiScaledWidth();
     int realHeight = minecraft.getWindow().getGuiScaledHeight();
-    uiScale = Math.min(1.0, (realHeight - 8.0) / MIN_HEIGHT);
+    uiScale = Math.min(1.0, Math.max(1.0, realHeight - 8.0) / MIN_HEIGHT);
     width = (int) Math.round(realWidth / uiScale);
     height = (int) Math.round(realHeight / uiScale);
     super.init();
@@ -379,10 +379,7 @@ public final class EncoderScreen extends NativeTerminalScreen {
       graphics.pose().pushPose();
       graphics.pose().translate(0, 0, 10);
       Icon.TOOLBAR_BUTTON_BACKGROUND.getBlitter().dest(getX(), getY(), 9, 10).blit(graphics);
-      icon.getBlitter()
-          .dest(getX(), getY() + 1, 8, 8)
-          .opacity(active ? 1 : 0.5f)
-          .blit(graphics);
+      icon.getBlitter().dest(getX(), getY() + 1, 8, 8).opacity(active ? 1 : 0.5f).blit(graphics);
       graphics.pose().popPose();
     }
 

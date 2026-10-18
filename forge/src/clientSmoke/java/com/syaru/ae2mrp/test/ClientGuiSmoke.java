@@ -47,6 +47,11 @@ public final class ClientGuiSmoke {
       if (serverFailure != null) throw serverFailure;
       if (System.nanoTime() > deadline)
         throw new IllegalStateException("GUI smoke timed out at phase " + phase);
+      if (mc.getWindow().getWidth() < 640 || mc.getWindow().getHeight() < 480) {
+        org.lwjgl.glfw.GLFW.glfwRestoreWindow(mc.getWindow().getWindow());
+        org.lwjgl.glfw.GLFW.glfwSetWindowSize(mc.getWindow().getWindow(), 1280, 960);
+        return;
+      }
       if (mc.screen
           instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen intro) {
         intro.onClose();
@@ -259,6 +264,7 @@ public final class ClientGuiSmoke {
     int width = (int) field(screen, "imageWidth");
     int height = (int) field(screen, "imageHeight");
     int middle = (int) field(screen, "middleY");
+    require((double) field(screen, "uiScale") > 0, "Invalid GUI scale");
     var nativeWidgets = ((EncodingWidgetsAccess) field(adapter, "widgets")).ae2mrp$widgets();
     var bounds = new net.minecraft.client.renderer.Rect2i(left, top, width, height);
     // The ordinary encoder keeps the original AE2 widget objects AND original style positions.
@@ -369,6 +375,9 @@ public final class ClientGuiSmoke {
 
   private static void capture(String name) throws java.io.IOException {
     var mc = Minecraft.getInstance();
+    require(
+        mc.getWindow().getWidth() >= 640 && mc.getWindow().getHeight() >= 480,
+        "Cannot accept a minimized or empty render target");
     var directory = mc.gameDirectory.toPath().resolve("screenshots");
     Files.createDirectories(directory);
     try (var image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {

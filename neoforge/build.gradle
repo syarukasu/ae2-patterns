@@ -44,6 +44,11 @@ neoForge {
     addModdingDependenciesTo sourceSets.gameTest
     addModdingDependenciesTo sourceSets.clientSmoke
 }
+neoForge.runs.gameTestServer.loadedMods.set([neoForge.mods.ae2mrp, neoForge.mods.ae2mrp_test])
+neoForge.runs.server.loadedMods.set([neoForge.mods.ae2mrp])
+if (!project.hasProperty('guiSmoke')) {
+    neoForge.runs.client.loadedMods.set([neoForge.mods.ae2mrp])
+}
 if (project.hasProperty('guiSmoke')) {
     neoForge.runs.client.loadedMods.set([neoForge.mods.ae2mrp, neoForge.mods.ae2mrp_gui_smoke])
     tasks.matching { it.name == 'runClient' }.configureEach {

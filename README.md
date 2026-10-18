@@ -1,5 +1,7 @@
 # AE2 Patterns
 
+<img src="artwork/original/encoded_composite_pattern.png" alt="AE2 Patterns" width="128" height="128" align="right">
+
 **AE2 Patterns** は、同じ完成品を作る複数の加工パターンをまとめ、
 指定した生産割合でAE2の自動クラフト計画へ組み込むアドオンです。
 素材不足時は「固定比率」か「自動再分配」を選べます。

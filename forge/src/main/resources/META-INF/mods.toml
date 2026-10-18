@@ -4,7 +4,7 @@ license="MIT"
 issueTrackerURL="https://github.com/syarukasu/ae2-patterns/issues"
 [[mods]]
 modId="ae2mrp"
-version="0.1.1"
+version="0.1.2"
 displayName="AE2 Patterns"
 logoFile="assets/ae2mrp/textures/item/encoded_composite_pattern.png"
 logoBlur=false

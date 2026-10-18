@@ -9,7 +9,7 @@
 エンコードした複合パターンをME接続ターミナルへ登録します。
 実際の加工・搬入・搬出はAE2と元の機械が担当します。ACOの改造ではありません。
 
-## 0.1.1
+## 0.1.2
 
 [GitHub Releases](https://github.com/syarukasu/ae2-patterns/releases) から、使用するMinecraftとLoaderに対応するJARを選んでください。
 クライアントとサーバーの両方に、本MODとApplied Energistics 2が必要です。

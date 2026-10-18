@@ -1,5 +1,21 @@
 # Validation, 2026-10-19
 
+## 0.1.2 icon packaging
+
+- Clean builds with --no-build-cache passed on both loaders: 12 core unit tests
+  and 22/22 required isolated GameTests per loader, zero failures/errors/skips.
+- Both runtime JARs declare 0.1.2 and reference the packaged 16x16 encoded
+  composite pattern icon with logoBlur=false. PNG hashes match the source.
+- Resource audit passed (20 JSON files, 46 bilingual keys), as did packaged
+  linkage checks, test-fixture exclusion checks and git diff --check.
+- No Java, GUI layout, crafting or saved-data behavior changed. The graphical
+  evidence below belongs to 0.1.1; graphical smoke was not repeated for 0.1.2.
+  The mod-list icon was verified in the archive, not in a running game screen.
+- Forge SHA-256: BCE03F1C411E3A83A447F6E4D0D1901F1BB202F1B20ECAF3608E0C2954DA77F7.
+- NeoForge SHA-256: 0C693218E3A46477C5FEDDA26BC1FF84268A635780C5D5F40131EEBC5A94FDF8.
+- Full live-user-modpack acceptance remains unverified. No live pack or world
+  was modified.
+
 ## 0.1.1 publication
 
 - Version metadata is 0.1.1 on both loaders. Clean builds with --no-build-cache,

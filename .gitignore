@@ -1,0 +1,9 @@
+.gradle/
+**/build/
+**/run/
+**/run-server/
+.idea/
+tools/*.jar
+dist/
+docs/evidence/ae2-1211-reference/
+docs/evidence/gui-alpha.11/pre-clean-*

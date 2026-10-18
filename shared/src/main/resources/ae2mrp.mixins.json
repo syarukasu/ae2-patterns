@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.syaru.ae2mrp.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": ["CalculationAccess", "ProcessAccess", "CompositeServiceMixin", "OptionalNativeVmMixin", "OptionalAcoContextMixin", "OptionalAcoExecutionMixin", "OptionalAcoAggregateMixin", "CompositeCalculationMixin", "CompositeNodeMixin", "ControlProcessGuardMixin"],
+  "client": ["PatternAccessScreenAccess", "EncodingScreenAccess", "EncodingWidgetsAccess"],
+  "injectors": { "defaultRequire": 1 }
+}

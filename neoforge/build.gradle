@@ -1,0 +1,89 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
+java.withSourcesJar()
+sourceSets {
+    clientSmoke {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    gameTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+base { archivesName = 'ae2-patterns-neoforge-1.21.1' }
+neoForge {
+    version = '21.1.247'
+    runs {
+        gameTestServer {
+            type = 'gameTestServer'
+            gameDirectory = file('build/gametest')
+            sourceSet = sourceSets.gameTest
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'ae2'
+            systemProperty 'ae2mrp.report', file('build/gametest/results.xml').absolutePath
+            systemProperty 'ae2mrp.test.planner', (project.findProperty('plannerBackend') ?: 'AE2').toString()
+        }
+        client {
+            client()
+            gameDirectory = file('run')
+            if (project.hasProperty('guiSmoke')) {
+                sourceSet = sourceSets.clientSmoke
+                gameDirectory = file('build/gui-smoke')
+                programArguments.addAll('--width', '1280', '--height', '960')
+            }
+        }
+        server { server(); gameDirectory = file('run-server'); programArgument '--nogui' }
+    }
+    mods {
+        ae2mrp { sourceSet sourceSets.main }
+        ae2mrp_test { sourceSet sourceSets.gameTest }
+        if (project.hasProperty('guiSmoke')) {
+            ae2mrp_gui_smoke { sourceSet sourceSets.clientSmoke }
+        }
+    }
+    addModdingDependenciesTo sourceSets.gameTest
+    addModdingDependenciesTo sourceSets.clientSmoke
+}
+if (project.hasProperty('guiSmoke')) {
+    neoForge.runs.client.loadedMods.set([neoForge.mods.ae2mrp, neoForge.mods.ae2mrp_gui_smoke])
+    tasks.matching { it.name == 'runClient' }.configureEach {
+        doFirst {
+            def world = file('build/gametest/world')
+            if (!new File(world, 'level.dat').isFile()) throw new GradleException('Run isolated GameTests before GUI smoke')
+            copy { from world; into file('build/gui-smoke/saves/gui-smoke') }
+            java.nio.file.Files.deleteIfExists(file('build/gui-smoke/gui-smoke-result.txt').toPath())
+        }
+        doLast {
+            def report = file('build/gui-smoke/gui-smoke-result.txt')
+            if (!report.isFile() || !report.text.startsWith('PASS')) throw new GradleException("GUI smoke failed: ${report}")
+        }
+    }
+}
+dependencies {
+    if(project.hasProperty('neoAcoJar')) {
+        def fixture=file(project.property('neoAcoJar'))
+        if(!fixture.isFile())throw new GradleException('neoAcoJar fixture does not exist')
+        runtimeOnly files(fixture)
+    }
+    if(project.hasProperty('neoVmJar')) {
+        def fixture=file(project.property('neoVmJar'))
+        if(!fixture.isFile())throw new GradleException('neoVmJar fixture does not exist')
+        runtimeOnly files(fixture)
+    }
+    implementation('org.appliedenergistics:appliedenergistics2:19.2.17') { transitive = false }
+    runtimeOnly('org.appliedenergistics:guideme:21.1.17') { transitive = false }
+}
+sourceSets.main.java.srcDirs += ['../core/src/main/java', '../shared/src/main/java']
+sourceSets.main.resources.srcDir '../shared/src/main/resources'
+sourceSets.gameTest.java.srcDir '../shared/src/gameTest/java'
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    doFirst { java.nio.file.Files.deleteIfExists(file('build/gametest/results.xml').toPath()) }
+    doLast {
+        def report=file('build/gametest/results.xml')
+        if(!report.isFile()) throw new GradleException('Missing GameTest report')
+        def xml=new groovy.util.XmlSlurper().parse(report)
+        def tests=xml.depthFirst().findAll { it.name()=='testcase' }
+        if(tests.size()!=22 || tests.any { !it.failure.isEmpty() || !it.error.isEmpty() || !it.skipped.isEmpty() })
+            throw new GradleException("GameTest acceptance failed: ${report}")
+    }
+}

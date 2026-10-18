@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [{"item": "ae2:wireless_terminal"}, {"item": "ae2mrp:composite_pattern_encoder"}],
+  "result": {"item": "ae2mrp:wireless_pattern_terminal"}
+}

@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+issueTrackerURL="https://github.com/syarukasu/ae2-patterns/issues"
+[[mods]]
+modId="ae2mrp"
+version="0.1.0"
+displayName="AE2 Patterns"
+authors="syarukasu"
+displayURL="https://github.com/syarukasu/ae2-patterns"
+description='''Combine processing patterns for the same output with fixed shares or adaptive redistribution.
+Reference mounted source patterns without removing them, find same-output recipes and encode composite patterns in one ME-connected terminal.
+Register composites in the terminal; AE2 and the original machines own crafting execution.'''
+[[dependencies.ae2mrp]]
+modId="forge"
+mandatory=true
+versionRange="[47.4,48)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.ae2mrp]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.20.2)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.ae2mrp]]
+modId="ae2"
+mandatory=true
+versionRange="[15.4.10,16)"
+ordering="AFTER"
+side="BOTH"

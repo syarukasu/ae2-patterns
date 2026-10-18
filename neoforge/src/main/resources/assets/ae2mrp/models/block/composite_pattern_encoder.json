@@ -1,0 +1,10 @@
+{
+  "loader": "neoforge:composite",
+  "ambientocclusion": false,
+  "textures": {"particle": "ae2:part/monitor_back"},
+  "transform": {"translation": [0, 0, 0.8125]},
+  "children": {
+    "frame": {"parent": "ae2:part/monitor_base", "render_type": "minecraft:cutout"},
+    "display": {"parent": "ae2:part/pattern_encoding_terminal_on", "render_type": "minecraft:cutout"}
+  }
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.syaru.ae2mrp.core.AdaptiveDistributorTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-17T17:45:40" hostname="DESKTOP-IJ6J5K0" time="0.029">
+  <properties/>
+  <testcase name="cancellationAndInvalidResultsAreNotReinterpretedAsShortage()" classname="com.syaru.ae2mrp.core.AdaptiveDistributorTest" time="0.02"/>
+  <testcase name="redistributesShortfallAndKeepsSurvivorsWeighted()" classname="com.syaru.ae2mrp.core.AdaptiveDistributorTest" time="0.002"/>
+  <testcase name="disabledRoutesNeverReceiveAnAllocation()" classname="com.syaru.ae2mrp.core.AdaptiveDistributorTest" time="0.002"/>
+  <testcase name="exactWideTargetsDoNotCauseQuantityLinearSearch()" classname="com.syaru.ae2mrp.core.AdaptiveDistributorTest" time="0.002"/>
+  <testcase name="consumesSharedCapacityOnlyOnceAndTerminatesWhenAllAreBlocked()" classname="com.syaru.ae2mrp.core.AdaptiveDistributorTest" time="0.001"/>
+  <testcase name="preservesPreferredSharesWhenFeasible()" classname="com.syaru.ae2mrp.core.AdaptiveDistributorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","pattern":["IQI","PAP","IRI"],"key":{"I":{"item":"minecraft:iron_ingot"},"Q":{"item":"ae2:quartz_glass"},"P":{"item":"ae2:calculation_processor"},"A":{"item":"ae2:engineering_processor"},"R":{"item":"minecraft:redstone"}},"result":{"id":"ae2mrp:composite_pattern_encoder","count":1}}

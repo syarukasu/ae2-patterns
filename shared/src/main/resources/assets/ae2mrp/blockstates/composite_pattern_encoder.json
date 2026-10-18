@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model": "ae2mrp:block/composite_pattern_encoder"},
+    "facing=east": {"model": "ae2mrp:block/composite_pattern_encoder", "y": 90},
+    "facing=south": {"model": "ae2mrp:block/composite_pattern_encoder", "y": 180},
+    "facing=west": {"model": "ae2mrp:block/composite_pattern_encoder", "y": 270}
+  }
+}

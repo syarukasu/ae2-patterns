@@ -1,0 +1,20 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '6.0.54' apply false
+    id 'net.neoforged.moddev' version '2.0.143' apply false
+}
+allprojects {
+    group = 'com.syaru.ae2mrp'
+    version = '0.1.0'
+    repositories { mavenCentral() }
+}
+subprojects {
+    tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+    plugins.withId('java') {
+        dependencies {
+            testImplementation platform('org.junit:junit-bom:5.11.4')
+            testImplementation 'org.junit.jupiter:junit-jupiter'
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        }
+        tasks.withType(Test).configureEach { useJUnitPlatform() }
+    }
+}

@@ -1,5 +1,31 @@
 # Validation, 2026-10-19
 
+## 0.1.0 layout correction before binary release
+
+- The initial graphical acceptance checked actions but missed overlapping addon
+  controls. User review correctly rejected that as sufficient layout acceptance.
+- Ordinary encoding still uses AE2's actual panels, icon buttons, mode tabs and
+  original style coordinates. No replacement layout or custom ordinary encoder
+  is introduced. GUI smoke now compares every native widget position against
+  the unmodified AE2 encoding style at each mode/scale/reopen stage.
+- Addon compact buttons now scale their native icon/background to their actual
+  click area. Registration arrows stay inside the composite band. Route switches
+  reserve their actual 22x12 drawing area; preview-clear buttons are beside the
+  percentage field, not over the switches.
+- GUI checks reject custom-widget intersections with other custom controls,
+  native encoding widgets and visible inventory slots. Reference previews are
+  present so the clear controls are actually exercised in the layout check.
+- Both loader builds and both graphical runs passed after this correction,
+  including original native positions across four modes and both GUI scales.
+  Screenshots/reports: evidence/gui-0.1.0-layout-forge/ and
+  evidence/gui-0.1.0-layout-neoforge/. Packaged-linkage and diff checks passed.
+- The initially submitted CurseForge files 9243434 and 9243445 were archived,
+  not deleted. No GitHub binary Release/tag was created. Publication is on hold
+  while the corrected actual screen is presented for layout review.
+- Corrected runtime SHA-256: Forge
+  2435241B6462681FD16ECD05BD40B1D4A2B0312D0A9FC69FE96CDCC446252376;
+  NeoForge C9F7A2C248FBEC48A542D6D7689B67C885DE65009B75A5D4524196208A4638D0.
+
 ## 0.1.0 public release
 
 - Release metadata is 0.1.0 on both loaders. Clean build with --no-build-cache,

@@ -1,5 +1,7 @@
 # AE2 Patterns 0.1.0
 
+Status: binary publication held pending layout review of the corrected actual screen.
+
 Initial public release. Install on both the client and the server, with Applied Energistics 2.
 
 ## Downloads

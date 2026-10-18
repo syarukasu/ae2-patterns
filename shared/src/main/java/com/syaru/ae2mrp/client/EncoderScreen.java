@@ -72,7 +72,7 @@ public final class EncoderScreen extends NativeTerminalScreen {
     for (int i = 0; i < 8; i++) {
       final int route = i;
       int x = leftPos + 10 + i % 4 * 44, y = topPos + middleY + 16 + i / 4 * 35;
-      var field = new EditBox(font, x, y + 18, 29, 12, Component.translatable("gui.ae2mrp.weight"));
+      var field = new EditBox(font, x, y + 18, 24, 12, Component.translatable("gui.ae2mrp.weight"));
       field.setMaxLength(3);
       field.setFilter(s -> s.isEmpty() || s.matches("[0-9]{1,3}") && Integer.parseInt(s) <= 100);
       field.setValue(Integer.toString(menu.weight(i)));
@@ -82,13 +82,13 @@ public final class EncoderScreen extends NativeTerminalScreen {
           });
       weights[i] = addRenderableWidget(field);
       toggles[i] =
-          addRenderableWidget(new AECheckbox(x + 18, y + 1, 14, 14, getStyle(), Component.empty()));
+          addRenderableWidget(new AECheckbox(x + 18, y + 2, 22, 12, getStyle(), Component.empty()));
       toggles[i].setChangeListener(() -> command(route, 109));
       toggles[i].setTooltip(Tooltip.create(Component.translatable("gui.ae2mrp.toggle")));
       clears[i] =
           addRenderableWidget(
               new NativeIconButton(
-                  x + 34, y, Icon.CLEAR, "clear_preview", () -> command(route, 110)));
+                  x + 34, y + 19, Icon.CLEAR, "clear_preview", () -> command(route, 110)));
     }
     redistribute =
         addRenderableWidget(
@@ -104,7 +104,7 @@ public final class EncoderScreen extends NativeTerminalScreen {
         addRenderableWidget(
             new NativeIconButton(
                 leftPos + 175,
-                topPos + middleY + 126,
+                topPos + middleY + 124,
                 Icon.ARROW_UP,
                 "previous_registration_row",
                 () -> changeRegistrationRow(-1)));
@@ -112,7 +112,7 @@ public final class EncoderScreen extends NativeTerminalScreen {
         addRenderableWidget(
             new NativeIconButton(
                 leftPos + 175,
-                topPos + middleY + 135,
+                topPos + middleY + 134,
                 Icon.ARROW_DOWN,
                 "next_registration_row",
                 () -> changeRegistrationRow(1)));
@@ -286,7 +286,7 @@ public final class EncoderScreen extends NativeTerminalScreen {
     g.drawString(
         font, Component.translatable("gui.ae2mrp.total", total()), 83, middleY + 112, INK, false);
     for (int i = 0; i < 8; i++)
-      g.drawString(font, "%", 41 + i % 4 * 44, middleY + 36 + i / 4 * 35, INK, false);
+      g.drawString(font, "%", 36 + i % 4 * 44, middleY + 36 + i / 4 * 35, INK, false);
     g.drawString(
         font,
         (registrationRow + 1) + "/" + TerminalLogic.REGISTRATION_ROWS,
@@ -360,6 +360,35 @@ public final class EncoderScreen extends NativeTerminalScreen {
     @Override
     protected Icon getIcon() {
       return icon;
+    }
+
+    @Override
+    public void setHalfSize(boolean compact) {
+      super.setHalfSize(compact);
+      setWidth(compact ? 9 : 16);
+      setHeight(compact ? 10 : 16);
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partial) {
+      if (!isHalfSize()) {
+        super.renderWidget(graphics, mouseX, mouseY, partial);
+        return;
+      }
+      // AE2's half-size flag changes hit bounds but does not resize its icon blitter.
+      graphics.pose().pushPose();
+      graphics.pose().translate(0, 0, 10);
+      Icon.TOOLBAR_BUTTON_BACKGROUND.getBlitter().dest(getX(), getY(), 9, 10).blit(graphics);
+      icon.getBlitter()
+          .dest(getX(), getY() + 1, 8, 8)
+          .opacity(active ? 1 : 0.5f)
+          .blit(graphics);
+      graphics.pose().popPose();
+    }
+
+    @Override
+    public Rect2i getTooltipArea() {
+      return new Rect2i(getX(), getY(), getWidth(), getHeight());
     }
   }
 }

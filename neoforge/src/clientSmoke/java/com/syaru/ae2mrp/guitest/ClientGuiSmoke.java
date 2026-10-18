@@ -102,7 +102,16 @@ public final class ClientGuiSmoke {
                   mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
               System.out.println(
                   "MRP_GUI_SMOKE open at " + player.position() + " target=" + terminal);
-              player.openMenu((EncoderBlockEntity) player.serverLevel().getBlockEntity(terminal));
+              var be = (EncoderBlockEntity) player.serverLevel().getBlockEntity(terminal);
+              be.inventory.setItem(0, ItemStack.EMPTY);
+              be.inventory.setItem(1, ItemStack.EMPTY);
+              require(
+                  be.inventory.reference(0, processing(Items.COBBLESTONE), be.terminal.grid()),
+                  "First mounted pattern reference failed");
+              require(
+                  be.inventory.reference(1, processing(Items.GRAVEL), be.terminal.grid()),
+                  "Second mounted pattern reference failed");
+              player.openMenu(be);
               require(
                   player.containerMenu instanceof EncoderMenu
                       && player.containerMenu.stillValid(player),
@@ -133,6 +142,7 @@ public final class ClientGuiSmoke {
               + screen.height);
       var adapter = (AEBaseScreen<?>) field(screen, "encoding");
       var panels = (EncodingScreenAccess) adapter;
+      checkLayout(screen, adapter);
       var parentAreas = ((EncodingWidgetsAccess) field(screen, "widgets")).ae2mrp$tooltips();
       var nativeAreas = ((EncodingWidgetsAccess) field(adapter, "widgets")).ae2mrp$tooltips();
       require(
@@ -239,6 +249,67 @@ public final class ClientGuiSmoke {
       error.printStackTrace();
       finish("FAIL at phase " + phase + ": " + error);
     }
+  }
+
+  private static void checkLayout(EncoderScreen screen, AEBaseScreen<?> adapter)
+      throws ReflectiveOperationException {
+    int left = (int) field(screen, "leftPos");
+    int top = (int) field(screen, "topPos");
+    int width = (int) field(screen, "imageWidth");
+    int height = (int) field(screen, "imageHeight");
+    int middle = (int) field(screen, "middleY");
+    var nativeWidgets = ((EncodingWidgetsAccess) field(adapter, "widgets")).ae2mrp$widgets();
+    var bounds = new net.minecraft.client.renderer.Rect2i(left, top, width, height);
+    // The ordinary encoder keeps the original AE2 widget objects AND original style positions.
+    for (var entry : nativeWidgets.entrySet()) {
+      var expected = adapter.getStyle().getWidget(entry.getKey()).resolve(bounds);
+      var widget = entry.getValue();
+      require(
+          widget.getX() == expected.getX() && widget.getY() == expected.getY(),
+          "Native encoding position changed: " + entry.getKey());
+    }
+    var custom = new java.util.ArrayList<net.minecraft.client.gui.components.AbstractWidget>();
+    for (String name : new String[] {"weights", "toggles", "clears"})
+      for (var widget : (net.minecraft.client.gui.components.AbstractWidget[]) field(screen, name))
+        if (widget.visible) custom.add(widget);
+    for (String name : new String[] {"redistribute", "encode", "previousRow", "nextRow"})
+      custom.add((net.minecraft.client.gui.components.AbstractWidget) field(screen, name));
+    for (int i = 0; i < custom.size(); i++) {
+      var widget = custom.get(i);
+      require(
+          widget.getX() >= left
+              && widget.getX() + widget.getWidth() <= left + width
+              && widget.getY() >= top + middle
+              && widget.getY() + widget.getHeight() <= top + middle + 144,
+          "Composite control escapes into native encoder: " + widget.getMessage());
+      for (int j = i + 1; j < custom.size(); j++)
+        require(!overlap(widget, custom.get(j)), "Composite controls overlap");
+      for (var nativeWidget : nativeWidgets.values())
+        if (nativeWidget.visible)
+          require(!overlap(widget, nativeWidget), "Composite control covers native encoding icon");
+      for (var slot : screen.getMenu().slots) {
+        if (slot.x < 0 || slot.x >= width || slot.y < 0 || slot.y >= height) continue;
+        require(
+            widget.getX() + widget.getWidth() <= left + slot.x
+                || widget.getX() >= left + slot.x + 16
+                || widget.getY() + widget.getHeight() <= top + slot.y
+                || widget.getY() >= top + slot.y + 16,
+            "Composite control covers slot");
+      }
+    }
+    for (var toggle : (AECheckbox[]) field(screen, "toggles"))
+      require(
+          toggle.getWidth() == 22 && toggle.getHeight() == 12,
+          "Checkbox drawing and click bounds differ");
+  }
+
+  private static boolean overlap(
+      net.minecraft.client.gui.components.AbstractWidget a,
+      net.minecraft.client.gui.components.AbstractWidget b) {
+    return a.getX() < b.getX() + b.getWidth()
+        && a.getX() + a.getWidth() > b.getX()
+        && a.getY() < b.getY() + b.getHeight()
+        && a.getY() + a.getHeight() > b.getY();
   }
 
   private static ItemStack processing(net.minecraft.world.item.Item input) {

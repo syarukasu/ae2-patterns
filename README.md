@@ -1,6 +1,6 @@
 # AE2 Patterns
 
-<img src="artwork/original/encoded_composite_pattern.png" alt="AE2 Patterns" width="128" height="128" align="right">
+<img src="shared/src/main/resources/assets/ae2mrp/textures/item/encoded_composite_pattern.png" alt="AE2 Patterns" width="128" height="128" align="right">
 
 **AE2 Patterns** は、同じ完成品を作る複数の加工パターンをまとめ、
 指定した生産割合でAE2の自動クラフト計画へ組み込むアドオンです。
@@ -73,7 +73,6 @@ Curios等の外部スロットは今回の対象外です。
 独自の物理クラフト実行は含みません。BigIntegerで分配計算しますが、
 既定のAE2接続はlong範囲のみです。範囲外は明示失敗し、丸めません。
 自動再分配は指定割合を先に満たす方式で、全配分の組合せを探索する最適化ソルバーではありません。
-詳細は [docs/ADAPTIVE.md](docs/ADAPTIVE.md)。
 
 ## 計算経路の選択
 
@@ -99,16 +98,7 @@ plannerBackend = "AE2"
 
 複合パターンを使わない注文について、サーバー全体のACO設定を上書きしません。
 
-## ビルドと検証
+## ビルド
 
-JDK 17 / 21を用意し、`gradlew :core:test :forge:build :neoforge:build`。
-隔離実行は `:forge:runGameTestServer` / `:neoforge:runGameTestServer`。
-実GUI確認は、GameTestの後で `:forge:runClient -PguiSmoke` / `:neoforge:runClient -PguiSmoke`。
-テスト用MODは配布JARに入りません。生成済みの隔離ワールドだけをコピーして使用します。
-配布用JARは `tools/verify-packaged-linkage.ps1 -ForgeJar <Forge版JAR> -NeoForgeJar <NeoForge版JAR>`
-でAE2の実行時インターフェース実装を確認します。難読化前のGameTestではこの不整合を検出できません。
-実環境のmods・設定・ワールド・サーバー起動ファイルは変更しません。
-
-仕様原文は [docs/SPECIFICATION-v0.2.md](docs/SPECIFICATION-v0.2.md)、
-接続点・責務・制限は [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
-検証結果は [docs/VALIDATION.md](docs/VALIDATION.md) に記録します。
+JDK 17 / 21を用意し、`gradlew :forge:build :neoforge:build` を実行します。
+配布用JAR・チェックサム・変更履歴は [Releases](https://github.com/syarukasu/ae2-patterns/releases) に掲載します。

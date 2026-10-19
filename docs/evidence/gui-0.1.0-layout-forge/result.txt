@@ -1,1 +1,0 @@
-PASS: native screen open, four modes, shared tooltip areas, nine visible slots, six registration rows, mouse clicks, mounted provider patterns, native model bounds/textures, checkbox sync, resize, close and reopen

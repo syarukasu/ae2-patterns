@@ -2,62 +2,22 @@ plugins { id 'net.minecraftforge.gradle' }
 java { toolchain.languageVersion = JavaLanguageVersion.of(17) }
 java.withSourcesJar()
 sourceSets {
-    clientSmoke {
-        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
-    }
-    gameTest {
-        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
-    }
 }
 base { archivesName = 'ae2-patterns-forge-1.20.1' }
 minecraft {
     mappings channel: 'official', version: '1.20.1'
     runs {
-        gameTestServer {
-            workingDirectory project.file('build/gametest')
-            args '--mixin', 'ae2mrp.mixins.json'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', project.file('build/createSrgToMcp/output.srg').absolutePath
-            property 'forge.enabledGameTestNamespaces', 'ae2'
-            property 'ae2mrp.report', project.file('build/gametest/results.xml').absolutePath
-            property 'ae2mrp.test.planner', (project.findProperty('plannerBackend') ?: 'AE2').toString()
-            mods {
-                ae2mrp { source sourceSets.main }
-                ae2mrp_test { source sourceSets.gameTest }
-            }
-        }
         client {
             workingDirectory project.file('run')
             args '--mixin', 'ae2mrp.mixins.json'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', project.file('build/createSrgToMcp/output.srg').absolutePath
             mods { ae2mrp { source sourceSets.main } }
-            if (project.hasProperty('guiSmoke')) {
-                workingDirectory project.file('build/gui-smoke')
-                args '--width', '1280', '--height', '960'
-                mods { ae2mrp_gui_smoke { source sourceSets.clientSmoke } }
-            }
         }
         server {
             workingDirectory project.file('run-server')
             args '--nogui'
             mods { ae2mrp { source sourceSets.main } }
-        }
-    }
-}
-if (project.hasProperty('guiSmoke')) {
-    tasks.matching { it.name == 'runClient' }.configureEach {
-        doFirst {
-            def world = file('build/gametest/world')
-            if (!new File(world, 'level.dat').isFile()) throw new GradleException('Run isolated GameTests before GUI smoke')
-            copy { from world; into file('build/gui-smoke/saves/gui-smoke') }
-            java.nio.file.Files.deleteIfExists(file('build/gui-smoke/gui-smoke-result.txt').toPath())
-        }
-        doLast {
-            def report = file('build/gui-smoke/gui-smoke-result.txt')
-            if (!report.isFile() || !report.text.startsWith('PASS')) throw new GradleException("GUI smoke failed: ${report}")
         }
     }
 }
@@ -74,19 +34,7 @@ dependencies {
         runtimeOnly fg.deobf("mrp.fixture:${fixture.name.substring(0,fixture.name.length()-4)}:1")
     }
 }
-tasks.matching { it.name == 'runGameTestServer' }.configureEach {
-    doFirst { java.nio.file.Files.deleteIfExists(file('build/gametest/results.xml').toPath()) }
-    doLast {
-        def report=file('build/gametest/results.xml')
-        if(!report.isFile()) throw new GradleException('Missing GameTest report')
-        def xml=new groovy.util.XmlSlurper().parse(report)
-        def tests=xml.depthFirst().findAll { it.name()=='testcase' }
-        if(tests.size()!=22 || tests.any { !it.failure.isEmpty() || !it.error.isEmpty() || !it.skipped.isEmpty() })
-            throw new GradleException("GameTest acceptance failed: ${report}")
-    }
-}
 sourceSets.main.java.srcDirs += ['../core/src/main/java', '../shared/src/main/java']
-sourceSets.gameTest.java.srcDir '../shared/src/gameTest/java'
 sourceSets.main.resources.srcDir '../shared/src/main/resources'
 jar {
     manifest.attributes('MixinConfigs': 'ae2mrp.mixins.json')

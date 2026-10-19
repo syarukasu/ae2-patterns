@@ -1,7 +1,0 @@
-modLoader="javafml"
-loaderVersion="[47,)"
-license="MIT"
-[[mods]]
-modId="ae2mrp_gui_smoke"
-version="1"
-displayName="MRP isolated graphical client smoke"

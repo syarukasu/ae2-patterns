@@ -6,6 +6,7 @@ import appeng.menu.guisync.GuiSync;
 import appeng.parts.encoding.EncodingMode;
 import com.syaru.ae2mrp.core.DistributionMode;
 import com.syaru.ae2mrp.platform.EncoderBlockEntity;
+import com.syaru.ae2mrp.platform.EncoderHost;
 import com.syaru.ae2mrp.platform.NativeEncodingMenu;
 import com.syaru.ae2mrp.platform.NativePatternMenu;
 import com.syaru.ae2mrp.platform.Platform;
@@ -35,7 +36,7 @@ public final class EncoderMenu extends NativePatternMenu {
   public static final int REGISTRY_START = 46;
   public static final int REGISTRY_END = REGISTRY_START + TerminalLogic.REGISTRATION_SLOTS;
   public static final int NATIVE_START = REGISTRY_END;
-  private final EncoderBlockEntity host;
+  private final EncoderHost host;
   private final NativeEncodingMenu normal;
 
   @GuiSync(2)
@@ -57,7 +58,7 @@ public final class EncoderMenu extends NativePatternMenu {
     "READY",
     "ENCODED",
     "ROUTE_COUNT",
-    "SIMPLE_PROCESSING_ONLY",
+    "SOURCE_PATTERN_UNSUPPORTED",
     "DUPLICATE_PATTERN",
     "OUTPUT_MISMATCH",
     "POSITIVE_ROUTE_COUNT",
@@ -102,8 +103,18 @@ public final class EncoderMenu extends NativePatternMenu {
       Container inventory,
       ContainerLevelAccess access,
       TerminalLogic terminal) {
-    super(Platform.menu(), id, player, findHost(player, access));
-    host = (EncoderBlockEntity) getTarget();
+    this(id, player, inventory, access, terminal, findHost(player, access));
+  }
+
+  public EncoderMenu(
+      int id,
+      Inventory player,
+      Container inventory,
+      ContainerLevelAccess access,
+      TerminalLogic terminal,
+      EncoderHost actualHost) {
+    super(Platform.menu(), id, player, actualHost);
+    host = actualHost;
     this.inventory = inventory;
     this.access = access;
     this.terminal = terminal;
@@ -264,19 +275,19 @@ public final class EncoderMenu extends NativePatternMenu {
     registerClientAction("encode", () -> normalAction(normal::encode));
     registerClientAction("clear", () -> normalAction(normal::clear));
     registerClientAction(
-        "setMode", EncodingMode.class, value -> normalAction(() -> host.encoding.setMode(value)));
+        "setMode", EncodingMode.class, value -> normalAction(() -> host.getLogic().setMode(value)));
     registerClientAction(
         "setSubstitution",
         Boolean.class,
-        value -> normalAction(() -> host.encoding.setSubstitution(value)));
+        value -> normalAction(() -> host.getLogic().setSubstitution(value)));
     registerClientAction(
         "setFluidSubstitution",
         Boolean.class,
-        value -> normalAction(() -> host.encoding.setFluidSubstitution(value)));
+        value -> normalAction(() -> host.getLogic().setFluidSubstitution(value)));
     registerClientAction(
         "setStonecuttingRecipeId",
         net.minecraft.resources.ResourceLocation.class,
-        value -> normalAction(() -> host.encoding.setStonecuttingRecipeId(value)));
+        value -> normalAction(() -> host.getLogic().setStonecuttingRecipeId(value)));
     registerClientAction(
         "cycleProcessingOutput", () -> normalAction(normal::cycleProcessingOutput));
     updateNormalState();
@@ -480,7 +491,11 @@ public final class EncoderMenu extends NativePatternMenu {
   @Override
   public boolean stillValid(Player player) {
     if (wirelessAccess != null) return wirelessAccess.valid();
-    return stillValid(access, player, Platform.block());
+    if (player.level().isClientSide) return true;
+    var pos = host.position();
+    return host.present()
+        && host.hostLevel() == player.level()
+        && player.distanceToSqr(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) <= 64;
   }
 
   private boolean isWirelessSlot(int index) {

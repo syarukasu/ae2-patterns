@@ -105,10 +105,7 @@ public abstract class CompositeNodeMixin {
       if (parent != null && !((ProcessAccess) parent).ae2mrp$notRecursive(actual.get()))
         throw new IllegalStateException("COMPOSITE_RECURSION: " + what);
       long operations = allocation.operations().longValueExact();
-      for (var input : actual.get().getInputs())
-        for (var possible : input.getPossibleInputs())
-          Math.multiplyExact(
-              Math.multiplyExact(possible.amount(), input.getMultiplier()), operations);
+      ae2mrp$checkNativeAmounts(actual.get(), operations);
       processes.add(
           new CraftingTreeProcess(service, job, actual.get(), (CraftingTreeNode) (Object) this));
       counts.add(operations);
@@ -252,6 +249,7 @@ public abstract class CompositeNodeMixin {
 
   @Unique
   private static long ae2mrp$checkNativeAmounts(IPatternDetails original, long operations) {
+    for (var output : original.getOutputs()) Math.multiplyExact(output.amount(), operations);
     for (var input : original.getInputs())
       for (var possible : input.getPossibleInputs())
         Math.multiplyExact(

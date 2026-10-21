@@ -5,12 +5,18 @@ import net.minecraft.world.entity.player.Inventory;
 
 /** Native encoder slots and operations; the enclosing menu owns all network synchronization. */
 public final class NativeEncodingMenu extends PatternEncodingTermMenu {
-  private final EncoderBlockEntity host;
+  private final EncoderHost host;
 
-  public NativeEncodingMenu(int id, Inventory inventory, EncoderBlockEntity host) {
+  public NativeEncodingMenu(int id, Inventory inventory, EncoderHost host) {
     super(Platform.menu(), id, inventory, host, false);
     this.host = host;
     refreshFromHost();
+  }
+
+  @Override
+  protected boolean hideViewCells() {
+    // The enclosing PAT menu has no view-cell slots, regardless of the physical host.
+    return true;
   }
 
   @Override
@@ -20,10 +26,10 @@ public final class NativeEncodingMenu extends PatternEncodingTermMenu {
   }
 
   public void refreshFromHost() {
-    mode = host.encoding.getMode();
-    substitute = host.encoding.isSubstitution();
-    substituteFluids = host.encoding.isFluidSubstitution();
-    stonecuttingRecipeId = host.encoding.getStonecuttingRecipeId();
+    mode = host.getLogic().getMode();
+    substitute = host.getLogic().isSubstitution();
+    substituteFluids = host.getLogic().isFluidSubstitution();
+    stonecuttingRecipeId = host.getLogic().getStonecuttingRecipeId();
     if (isClientSide()) applySynchronizedState();
   }
 

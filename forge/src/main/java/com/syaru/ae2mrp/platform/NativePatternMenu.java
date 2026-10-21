@@ -7,8 +7,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 
 public abstract class NativePatternMenu extends PatternAccessTermMenu {
-  protected NativePatternMenu(
-      MenuType<?> type, int id, Inventory inventory, EncoderBlockEntity host) {
+  protected NativePatternMenu(MenuType<?> type, int id, Inventory inventory, EncoderHost host) {
     super(type, id, inventory, host, false);
   }
 

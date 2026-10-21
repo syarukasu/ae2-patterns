@@ -213,8 +213,8 @@ public final class EncoderState extends SimpleContainer {
       return false;
     }
     var details = Platform.decodeSource(source, level.get());
-    if (!Platform.isSimpleProcessing(details)) {
-      error = "SIMPLE_PROCESSING_ONLY";
+    if (!Platform.isSupportedSource(details)) {
+      error = "SOURCE_PATTERN_UNSUPPORTED";
       return false;
     }
     for (int i = 0; i < 8; i++) {

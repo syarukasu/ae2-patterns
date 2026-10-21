@@ -2,7 +2,8 @@ package com.syaru.ae2mrp.encoder;
 
 import appeng.core.AEConfig;
 import appeng.items.tools.powered.WirelessTerminalItem;
-import com.syaru.ae2mrp.platform.EncoderBlockEntity;
+import com.syaru.ae2mrp.platform.EncoderHost;
+import com.syaru.ae2mrp.platform.Platform;
 import com.syaru.ae2mrp.platform.WirelessData;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
@@ -25,13 +26,21 @@ public class WirelessPatternTerminalItem extends WirelessTerminalItem {
   @Override
   public InteractionResult useOn(UseOnContext context) {
     var player = context.getPlayer();
-    if (player == null
-        || !player.isShiftKeyDown()
-        || !(context.getLevel().getBlockEntity(context.getClickedPos())
-            instanceof EncoderBlockEntity be)) return InteractionResult.PASS;
+    if (player == null || !player.isShiftKeyDown()) return InteractionResult.PASS;
+    EncoderHost be = Platform.terminalAt(context.getLevel(), context.getClickedPos(), -1);
+    if (be == null) {
+      var cable =
+          appeng.api.parts.PartHelper.getPartHost(context.getLevel(), context.getClickedPos());
+      if (cable != null
+          && cable.selectPartWorld(context.getClickLocation()).part instanceof EncoderHost part)
+        be = part;
+    }
+    if (be == null) return InteractionResult.PASS;
     if (!context.getLevel().isClientSide) {
       WirelessData.bind(
-          context.getItemInHand(), GlobalPos.of(context.getLevel().dimension(), be.getBlockPos()));
+          context.getItemInHand(),
+          GlobalPos.of(context.getLevel().dimension(), be.position()),
+          be.partSide());
       player.displayClientMessage(Component.translatable("message.ae2mrp.terminal_bound"), true);
     }
     return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
@@ -55,12 +64,12 @@ public class WirelessPatternTerminalItem extends WirelessTerminalItem {
     var target = WirelessData.target(stack);
     if (target == null) return fail(player, "terminal_unbound");
     var targetLevel = serverLevel.getServer().getLevel(target.dimension());
-    if (targetLevel == null
-        || !targetLevel.hasChunkAt(target.pos())
-        || !(targetLevel.getBlockEntity(target.pos()) instanceof EncoderBlockEntity be))
+    if (targetLevel == null || !targetLevel.hasChunkAt(target.pos()))
       return fail(player, "terminal_unavailable");
+    var be = Platform.terminalAt(targetLevel, target.pos(), WirelessData.side(stack));
+    if (be == null || !be.present()) return fail(player, "terminal_unavailable");
     var grid = getLinkedGrid(stack, player.level(), null);
-    if (grid == null || be.terminal.grid() != grid) return fail(player, "wrong_network");
+    if (grid == null || be.terminal().grid() != grid) return fail(player, "wrong_network");
     if (!hasPower(player, .5, stack)) return fail(player, "wireless_unavailable");
     var access = WirelessData.access(this, player, inventorySlot, stack, be);
     if (!access.valid()) return fail(player, "wireless_unavailable");
@@ -68,14 +77,15 @@ public class WirelessPatternTerminalItem extends WirelessTerminalItem {
         .openMenu(
             new SimpleMenuProvider(
                 (id, inventory, owner) -> {
-                  be.inventory.readDraft();
+                  be.editor().readDraft();
                   var menu =
                       new EncoderMenu(
                           id,
                           inventory,
-                          be.inventory,
+                          be.editor(),
                           ContainerLevelAccess.create(targetLevel, target.pos()),
-                          be.terminal);
+                          be.terminal(),
+                          be);
                   menu.setWirelessAccess(access);
                   return menu;
                 },
@@ -88,19 +98,18 @@ public class WirelessPatternTerminalItem extends WirelessTerminalItem {
     return false;
   }
 
-  public boolean stillBound(Player player, int slot, ItemStack stack, EncoderBlockEntity be) {
+  public boolean stillBound(Player player, int slot, ItemStack stack, EncoderHost be) {
     var target = WirelessData.target(stack);
     return player.isAlive()
         && !player.isSpectator()
         && player.getInventory().getItem(slot) == stack
         && stack.is(this)
         && target != null
-        && target.dimension().equals(be.getLevel().dimension())
-        && target.pos().equals(be.getBlockPos())
-        && !be.isRemoved()
-        && be.getLevel().hasChunkAt(be.getBlockPos())
-        && be.getLevel().getBlockEntity(be.getBlockPos()) == be
-        && be.terminal.grid() != null
-        && getLinkedGrid(stack, player.level(), null) == be.terminal.grid();
+        && target.dimension().equals(be.hostLevel().dimension())
+        && target.pos().equals(be.position())
+        && WirelessData.side(stack) == be.partSide()
+        && be.present()
+        && be.terminal().grid() != null
+        && getLinkedGrid(stack, player.level(), null) == be.terminal().grid();
   }
 }

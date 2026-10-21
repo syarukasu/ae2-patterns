@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -52,7 +51,12 @@ public final class MrpMod {
       BLOCKS.register("composite_pattern_encoder", EncoderBlock::new);
   public static final Supplier<Item> ENCODER_ITEM =
       ITEMS.register(
-          "composite_pattern_encoder", () -> new BlockItem(ENCODER.get(), new Item.Properties()));
+          "composite_pattern_encoder",
+          () ->
+              new appeng.items.parts.PartItem<>(
+                  new Item.Properties(),
+                  com.syaru.ae2mrp.platform.EncoderPart.class,
+                  com.syaru.ae2mrp.platform.EncoderPart::new));
   public static final Supplier<BlockEntityType<EncoderBlockEntity>> ENTITY =
       ENTITIES.register(
           "composite_pattern_encoder",

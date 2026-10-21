@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class EncoderBlockEntity extends BlockEntity
     implements MenuProvider,
+        EncoderHost,
         appeng.api.storage.IPatternAccessTermMenuHost,
         appeng.helpers.IPatternTerminalMenuHost,
         appeng.api.networking.security.IActionHost {
@@ -55,6 +56,35 @@ public final class EncoderBlockEntity extends BlockEntity
 
   public final EncoderState inventory = new EncoderState(this::getLevel, this::setChanged);
   public final TerminalLogic terminal = new TerminalLogic(this::getLevel, this::setChanged);
+
+  @Override
+  public EncoderState editor() {
+    return inventory;
+  }
+
+  @Override
+  public net.minecraft.world.level.Level hostLevel() {
+    return getLevel();
+  }
+
+  @Override
+  public TerminalLogic terminal() {
+    return terminal;
+  }
+
+  @Override
+  public BlockPos position() {
+    return getBlockPos();
+  }
+
+  @Override
+  public boolean present() {
+    return !isRemoved()
+        && level != null
+        && level.hasChunkAt(worldPosition)
+        && level.getBlockEntity(worldPosition) == this;
+  }
+
   // Keep AE2's logic-host contract separate from Minecraft's BlockEntity method names.
   public final appeng.parts.encoding.PatternEncodingLogic encoding =
       new appeng.parts.encoding.PatternEncodingLogic(
@@ -90,7 +120,7 @@ public final class EncoderBlockEntity extends BlockEntity
 
   @Override
   public ItemStack getMainMenuIcon() {
-    return new ItemStack(Platform.block());
+    return new ItemStack(Platform.terminalItem());
   }
 
   @Override

@@ -9,8 +9,14 @@ import net.minecraft.world.item.ItemStack;
 
 public final class WirelessData {
   private static final String TARGET = "ae2mrp_terminal";
+  private static final String SIDE = "ae2mrp_terminal_side";
 
   public static void bind(ItemStack stack, GlobalPos target) {
+    bind(stack, target, -1);
+  }
+
+  public static void bind(ItemStack stack, GlobalPos target, int side) {
+    if (side < -1 || side > 5) throw new IllegalArgumentException("INVALID_TERMINAL_SIDE");
     var tag =
         stack
             .getOrDefault(
@@ -18,9 +24,22 @@ public final class WirelessData {
                 net.minecraft.world.item.component.CustomData.EMPTY)
             .copyTag();
     tag.put(TARGET, GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, target).result().orElseThrow());
+    tag.putInt(SIDE, side);
     stack.set(
         net.minecraft.core.component.DataComponents.CUSTOM_DATA,
         net.minecraft.world.item.component.CustomData.of(tag));
+  }
+
+  public static int side(ItemStack stack) {
+    var tag =
+        stack
+            .getOrDefault(
+                net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+                net.minecraft.world.item.component.CustomData.EMPTY)
+            .copyTag();
+    return !tag.contains(SIDE)
+        ? -1
+        : tag.contains(SIDE, net.minecraft.nbt.Tag.TAG_INT) ? tag.getInt(SIDE) : -2;
   }
 
   public static GlobalPos target(ItemStack stack) {
@@ -36,12 +55,8 @@ public final class WirelessData {
   }
 
   public static WirelessAccess access(
-      WirelessPatternTerminalItem item,
-      Player player,
-      int slot,
-      ItemStack stack,
-      EncoderBlockEntity be) {
-    var grid = be.terminal.grid();
+      WirelessPatternTerminalItem item, Player player, int slot, ItemStack stack, EncoderHost be) {
+    var grid = be.terminal().grid();
     var radio = new Radio(item, player, slot);
     return new WirelessAccess() {
       private boolean active = true;
@@ -53,7 +68,7 @@ public final class WirelessData {
       public boolean valid() {
         return active
             && item.stillBound(player, slot, stack, be)
-            && be.terminal.grid() == grid
+            && be.terminal().grid() == grid
             && radio.connected();
       }
 

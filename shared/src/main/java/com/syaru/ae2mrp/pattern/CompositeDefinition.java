@@ -18,7 +18,10 @@ public final class CompositeDefinition {
       List<appeng.api.stacks.GenericStack> alternatives, long multiplier) {}
 
   private record RecipeIdentity(
-      List<InputIdentity> inputs, appeng.api.stacks.GenericStack output) {}
+      Class<?> kind,
+      List<InputIdentity> inputs,
+      List<appeng.api.stacks.GenericStack> outputs,
+      AEKey nativeDefinition) {}
 
   public static final int SCHEMA = 1;
   private final List<ItemStack> patterns;
@@ -58,14 +61,20 @@ public final class CompositeDefinition {
     for (int i = 0; i < patterns.size(); i++) {
       var stack = patterns.get(i).copyWithCount(1);
       var pattern = Platform.decodeSource(stack, level);
-      if (pattern == null || !Platform.isSimpleProcessing(pattern))
-        throw new IllegalArgumentException("SIMPLE_PROCESSING_ONLY");
+      if (!Platform.isSupportedSource(pattern))
+        throw new IllegalArgumentException("SOURCE_PATTERN_UNSUPPORTED");
       var inputIdentity = new ArrayList<InputIdentity>();
       for (var input : pattern.getInputs())
         inputIdentity.add(
             new InputIdentity(List.of(input.getPossibleInputs()), input.getMultiplier()));
       if (!identities.add(
-          new RecipeIdentity(List.copyOf(inputIdentity), pattern.getPrimaryOutput())))
+          new RecipeIdentity(
+              pattern.getClass(),
+              List.copyOf(inputIdentity),
+              Platform.outputs(pattern),
+              pattern.getClass() == appeng.crafting.pattern.AEProcessingPattern.class
+                  ? null
+                  : pattern.getDefinition())))
         throw new IllegalArgumentException("DUPLICATE_PATTERN");
       var out = pattern.getPrimaryOutput();
       if (common != null && !common.equals(out.what()))

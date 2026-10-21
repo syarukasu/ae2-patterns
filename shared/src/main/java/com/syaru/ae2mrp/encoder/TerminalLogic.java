@@ -48,22 +48,28 @@ public final class TerminalLogic implements IInWorldGridNodeHost, IActionHost, I
       };
 
   public TerminalLogic(Supplier<Level> level, Runnable dirty) {
+    this(level, dirty, null);
+  }
+
+  public TerminalLogic(Supplier<Level> level, Runnable dirty, IManagedGridNode sharedNode) {
     this.level = level;
     node =
-        GridHelper.createManagedNode(
-                this,
-                new IGridNodeListener<TerminalLogic>() {
-                  @Override
-                  public void onSaveChanges(TerminalLogic owner, IGridNode gridNode) {
-                    dirty.run();
-                  }
-                })
-            .setInWorldNode(true)
-            .setTagName("GridNode")
-            .setVisualRepresentation(Platform.block())
-            .setIdlePowerUsage(1)
-            .setFlags(GridFlags.REQUIRE_CHANNEL)
-            .addService(ICraftingProvider.class, this);
+        sharedNode != null
+            ? sharedNode
+            : GridHelper.createManagedNode(
+                    this,
+                    new IGridNodeListener<TerminalLogic>() {
+                      @Override
+                      public void onSaveChanges(TerminalLogic owner, IGridNode gridNode) {
+                        dirty.run();
+                      }
+                    })
+                .setInWorldNode(true)
+                .setTagName("GridNode");
+    node.setVisualRepresentation(Platform.terminalItem())
+        .setIdlePowerUsage(1)
+        .setFlags(GridFlags.REQUIRE_CHANNEL)
+        .addService(ICraftingProvider.class, this);
     registered.addListener(
         container -> {
           dirty.run();

@@ -5,7 +5,6 @@ import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
-import appeng.crafting.pattern.AEProcessingPattern;
 import com.syaru.ae2mrp.MrpMod;
 import com.syaru.ae2mrp.core.DistributionMode;
 import com.syaru.ae2mrp.encoder.EncoderMenu;
@@ -44,6 +43,24 @@ public final class Platform {
     return MrpMod.ENCODER.get();
   }
 
+  public static Item terminalItem() {
+    return MrpMod.ENCODER_ITEM.get();
+  }
+
+  public static java.util.List<GenericStack> outputs(IPatternDetails pattern) {
+    return java.util.List.of(pattern.getOutputs());
+  }
+
+  public static EncoderHost terminalAt(Level level, net.minecraft.core.BlockPos pos, int side) {
+    if (side == -1) return level.getBlockEntity(pos) instanceof EncoderHost host ? host : null;
+    if (side < 0 || side > 5) return null;
+    return appeng.api.parts.PartHelper.getPart(
+                level, pos, net.minecraft.core.Direction.from3DDataValue(side))
+            instanceof EncoderHost host
+        ? host
+        : null;
+  }
+
   public static MenuType<EncoderMenu> menu() {
     return MrpMod.MENU.get();
   }
@@ -53,22 +70,8 @@ public final class Platform {
     return PatternDetailsHelper.decodePattern(stack, level, false);
   }
 
-  public static boolean isSimpleProcessing(IPatternDetails p) {
-    if (p.getClass() != AEProcessingPattern.class
-        || p.getInputs().length == 0
-        || p.getOutputs().length != 1
-        || !(p.getPrimaryOutput().what() instanceof AEItemKey)) return false;
-    if (p.getPrimaryOutput().amount() <= 0) return false;
-    for (var input : p.getInputs()) {
-      var possible = input.getPossibleInputs();
-      if (possible.length != 1
-          || input.getMultiplier() <= 0
-          || possible[0].amount() <= 0
-          || input.getRemainingKey(possible[0].what()) != null
-          || possible[0].what().equals(p.getPrimaryOutput().what())) return false;
-      Math.multiplyExact(input.getMultiplier(), possible[0].amount());
-    }
-    return true;
+  public static boolean isSupportedSource(IPatternDetails p) {
+    return com.syaru.ae2mrp.pattern.SourcePatternRules.supported(p);
   }
 
   public static void write(ItemStack result, CompositeDefinition definition, Level level) {

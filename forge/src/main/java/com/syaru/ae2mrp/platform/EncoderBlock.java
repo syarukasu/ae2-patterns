@@ -42,6 +42,12 @@ public final class EncoderBlock extends BaseEntityBlock {
   }
 
   @Override
+  public net.minecraft.world.item.ItemStack getCloneItemStack(
+      BlockGetter level, BlockPos pos, BlockState state) {
+    return new net.minecraft.world.item.ItemStack(Platform.terminalItem());
+  }
+
+  @Override
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
     builder.add(FACING);
   }

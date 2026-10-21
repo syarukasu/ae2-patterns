@@ -18,6 +18,8 @@
   "item.ae2mrp.blank_composite_pattern": "Blank Composite Pattern",
   "item.ae2mrp.encoded_composite_pattern": "Encoded Composite Pattern",
   "block.ae2mrp.composite_pattern_encoder": "Composite Pattern Terminal",
+  "item.ae2mrp.composite_pattern_encoder": "Composite Pattern Terminal",
+  "status.ae2mrp.source_pattern_unsupported": "Invalid source pattern or unsupported native amounts",
   "itemGroup.ae2mrp.patterns": "AE2 Patterns",
   "gui.ae2mrp.sources": "Patterns / share",
   "gui.ae2mrp.input": "Blank composite pattern / composite pattern to edit",

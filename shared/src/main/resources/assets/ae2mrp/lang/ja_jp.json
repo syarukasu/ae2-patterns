@@ -18,6 +18,8 @@
   "item.ae2mrp.blank_composite_pattern": "空の複合パターン",
   "item.ae2mrp.encoded_composite_pattern": "エンコード済み複合パターン",
   "block.ae2mrp.composite_pattern_encoder": "複合パターンターミナル",
+  "item.ae2mrp.composite_pattern_encoder": "複合パターンターミナル",
+  "status.ae2mrp.source_pattern_unsupported": "元パターンのデータが無効、または数量に対応していません",
   "itemGroup.ae2mrp.patterns": "AE2 Patterns",
   "gui.ae2mrp.sources": "元パターン / 生産割合",
   "gui.ae2mrp.input": "空の複合パターン / 再編集する複合パターン",

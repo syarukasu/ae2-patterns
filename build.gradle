@@ -10,6 +10,7 @@ allprojects {
 subprojects {
     tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
     plugins.withId('java') {
+        tasks.named('jar') { from rootProject.files('LICENSE', 'LICENSE-MIT', 'LICENSING.md') }
         dependencies {
         }
     }

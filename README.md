@@ -109,3 +109,8 @@ plannerBackend = "AE2"
 
 JDK 17 / 21を用意し、`gradlew :forge:build :neoforge:build` を実行します。
 配布用JAR・チェックサム・変更履歴は [Releases](https://github.com/syarukasu/ae2-patterns/releases) に掲載します。
+
+## Project License
+
+Original project code and resources: `LGPL-3.0-only`. See [LICENSE](LICENSE)
+and [LICENSING.md](LICENSING.md). Third-party material retains its own terms.

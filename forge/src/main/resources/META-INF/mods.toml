@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="[47,)"
-license="MIT"
+license="LGPL-3.0-only"
 issueTrackerURL="https://github.com/syarukasu/ae2-patterns/issues"
 [[mods]]
 modId="ae2mrp"
